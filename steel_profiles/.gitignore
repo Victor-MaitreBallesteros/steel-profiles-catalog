@@ -1,0 +1,16 @@
+# Environnements virtuels et caches Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+ENV/
+
+# Fichiers de build/distribution setuptools
+build/
+dist/
+*.egg-info/
+
+# VS Code
+.vscode/

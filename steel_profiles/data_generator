@@ -1,0 +1,109 @@
+import pandas as pd
+import io
+from sectionproperties.pre.library.steel_sections import i_section
+from sectionproperties.analysis.section import Section
+
+# 1. Les données brutes sous forme de texte CSV
+csv_data = """nom,famille,masse_kg_m,h_mm,b_mm,tw_mm,tf_mm,r_mm
+IPE 750 X 220,IPE,220,779,266,16.5,30,20
+IPE 600,IPE,122,600,220,12,19,24
+IPE 550,IPE,106,550,210,11.1,17.2,24
+IPE 500,IPE,90.7,500,200,10.2,16,21
+IPE 450,IPE,77.6,450,190,9.4,14.6,21
+IPE 400,IPE,66.3,400,180,8.6,13.5,21
+IPE 360,IPE,57.1,360,170,8,12.7,18
+IPE 330,IPE,49.1,330,160,7.5,11.5,18
+IPE 300,IPE,42.2,300,150,7.1,10.7,15
+IPE 270,IPE,36.1,270,135,6.6,10.2,15
+IPE 240,IPE,30.7,240,120,6.2,9.8,15
+IPE 220,IPE,26.2,220,110,5.9,9.2,12
+IPE 200,IPE,22.4,200,100,5.6,8.5,12
+IPE 180,IPE,18.8,180,91,5.3,8,9
+IPE 160,IPE,15.8,160,82,5,7.4,9
+IPE 140,IPE,12.9,140,73,4.7,6.9,7
+IPE 120,IPE,10.4,120,64,4.4,6.3,7
+IPE 100,IPE,8.1,100,55,4.1,5.7,7
+IPE 80,IPE,6,80,46,3.8,5.2,5
+HEB 1000,HE,314,1000,300,19,36,30
+HEA 1000,HE,272,990,300,16.5,31,30
+HEB 800,HE,262,800,300,17.5,33,30
+HEA 800,HE,224,790,300,15,28,30
+HEB 600,HE,212,600,300,15.5,30,27
+HEA 600,HE,178,590,300,13,25,27
+HEB 500,HE,187,500,300,14.5,28,27
+HEA 500,HE,155,490,300,12,23,27
+HEB 400,HE,155,400,300,13.5,24,27
+HEA 400,HE,125,390,300,11,19,27
+HEB 300,HE,117,300,300,11,19,27
+HEA 300,HE,88.3,290,300,8.5,14,27
+HEB 200,HE,61.3,200,200,9,15,18
+HEA 200,HE,42.3,190,200,6.5,10,18
+HEB 100,HE,20.4,100,100,6,10,12
+HEA 100,HE,16.7,96,100,5,8,12"""
+
+# 2. Lecture avec Pandas
+df = pd.read_csv(io.StringIO(csv_data))
+
+# 3. Préparation du code Python à écrire dans le futur fichier
+code_python = "# Fichier auto-généré\n\nPROFILES_DB = {\n"
+
+print("Début du traitement des profilés...")
+
+for index, row in df.iterrows():
+    nom = row['nom']
+    famille = row['famille']
+    masse = float(row['masse_kg_m'])
+    h = float(row['h_mm'])
+    b = float(row['b_mm'])
+    tw = float(row['tw_mm'])
+    tf = float(row['tf_mm'])
+    r = float(row['r_mm'])
+    
+    print(f"Calcul de {nom}... ({index + 1}/{len(df)})")
+    
+    # Calculs simples
+    hi = h - 2 * tf
+    d = hi - 2 * r
+    
+    # Calculs MEF via sectionproperties
+    geom = i_section(d=h, b=b, t_f=tf, t_w=tw, r=r, n_r=16)
+    
+    # Taille de maille adaptative (compromis vitesse/précision)
+    taille_maille_max = (h * b) / 100
+    geom.create_mesh(mesh_sizes=[taille_maille_max])
+    
+    sec = Section(geom)
+    sec.calculate_geometric_properties()
+    
+    A = sec.get_area()
+    ixx, iyy, _ = sec.get_ic()
+    
+    # Ajout du profilé dans le dictionnaire formaté
+    code_python += f'    "{nom}": {{\n'
+    code_python += f'        "famille": "{famille}",\n'
+    code_python += f'        "masse_kg_m": {masse},\n'
+    code_python += f'        "h_mm": {h},\n'
+    code_python += f'        "b_mm": {b},\n'
+    code_python += f'        "tw_mm": {tw},\n'
+    code_python += f'        "tf_mm": {tf},\n'
+    code_python += f'        "r_mm": {r},\n'
+    code_python += f'        "hi_mm": {hi:.2f},\n'
+    code_python += f'        "d_mm": {d:.2f},\n'
+    code_python += f'        "A_mm2": {A:.2f},\n'
+    code_python += f'        "Iy_mm4": {ixx:.2f},\n'
+    code_python += f'        "Iz_mm4": {iyy:.2f}\n'
+    code_python += f'    }},\n'
+
+code_python += "}\n"
+
+# 4. Écriture du résultat dans le fichier steel_profiles/data.py
+import os
+chemin_dossier = "steel_profiles"
+if not os.path.exists(chemin_dossier):
+    os.makedirs(chemin_dossier)
+
+chemin_fichier = os.path.join(chemin_dossier, "data.py")
+with open(chemin_fichier, "w", encoding="utf-8") as f:
+    f.write(code_python)
+
+print(f"\nTerminé ! Le fichier '{chemin_fichier}' a été généré avec succès.")

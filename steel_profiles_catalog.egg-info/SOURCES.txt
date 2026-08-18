@@ -1,0 +1,8 @@
+pyproject.toml
+steel_profiles/__init__.py
+steel_profiles/catalog.py
+steel_profiles/data.py
+steel_profiles_catalog.egg-info/PKG-INFO
+steel_profiles_catalog.egg-info/SOURCES.txt
+steel_profiles_catalog.egg-info/dependency_links.txt
+steel_profiles_catalog.egg-info/top_level.txt

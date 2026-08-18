@@ -1,0 +1,6 @@
+Metadata-Version: 2.4
+Name: steel-profiles-catalog
+Version: 0.1.0
+Summary: A catalog of I and H steel profiles for construction, including only their basic geometrical information
+Author: Victor-MaitreBallesteros
+Requires-Python: >=3.7
