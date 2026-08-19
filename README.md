@@ -1,20 +1,20 @@
 # Steel Profiles Catalog (`steel-profiles-catalog`)
 
-`steel-profiles-catalog` est un package Python pour les ingénieurs structure. Il fournit un catalogue numérique de profilés en acier gammes **IPE**, **HEA** et **HEB**) incluant leurs dimensions géométriques de base.
 
-Le package stocke les données pré-calculées dans un dictionnaire interne (`O(1)`), permettant des requêtes sans latence de lecture disque ou de maillage par éléments finis en temps réel.
 
-## Fonctionnement
+`steel-profiles-catalog` is a Python package for structural engineers. It provides a digital catalog of steel profiles (IPE, HEA, and HEB ranges) including their basic geometric dimensions.
 
-* Le data_generator.py contient en entrée les caractéristiques de base des profilés (extrait du catalogue de Arcelor Mittal) et produit en sortie le data.py qui lui est la bibliothèque contenant toutes les données.
-  * Le programme utilise la bibliothèque sectionproperties pour calculer l'aire et les inerties quadratiques
-* Le programme catalog.py prend le data.py en entrée et construit le dictionnaire
-* Ainsi, il est possible d'importer le package puis de renseigner le nom du profilé recherché pour obtenir les caractéristiques recherchées et pouvoir les utiliser.
+The package stores pre-calculated data in an internal dictionary (O(1)), allowing queries with no disk-read latency and avoiding the need for real-time finite element meshing.
 
+## How It Works
+* The data_generator.py script takes the basic characteristics of the profiles as input (extracted from the ArcelorMittal catalog) and outputs data.py, which acts as the library containing all the data.
+  * The program uses the sectionproperties library to calculate the cross-sectional area and moments of inertia.
+* The catalog.py script takes data.py as input and builds the dictionary.
+* As a result, you can simply import the package and query the name of the desired profile to retrieve its characteristics for use in your code.
 
 ---
 
-## 📂 Arborescence du projet
+## 📂 Project Structure
 
 ```text
 steel-profiles-catalog/
